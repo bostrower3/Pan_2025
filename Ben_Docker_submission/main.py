@@ -44,5 +44,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_file", required=True)
     parser.add_argument("--output_dir", required =True)
+    parser.add_argument("--use_gpu", required=False, default=True)
     args = parser.parse_args()
     main(args)
