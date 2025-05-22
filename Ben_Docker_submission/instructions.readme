@@ -1,1 +1,9 @@
+Upload via:
 
+```
+tira-cli code-submission \
+	--path . \
+	--task generative-ai-authorship-verification-panclef-2025 \
+	--dataset pan25-generative-ai-detection-smoke-test-20250428-training \
+	--command 'python3 main.py --input_file $inputDataset/*.jsonl --output_dir $outputDir'
+```
