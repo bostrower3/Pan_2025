@@ -19,24 +19,21 @@ from transformers import RobertaTokenizer, RobertaModel
 
 
 import nltk
+nltk.data.path.append("/usr/local/nltk_data")
 
-nltk.download('punkt')
-nltk.download('punkt_tab')
-nltk.download('averaged_perceptron_tagger_eng')
-nltk.download('punkt_tab')
+
 import spacy
 
 nlp = spacy.load('en_core_web_sm')
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
-nltk.download('stopwords')
+
 stopwords_english = set(stopwords.words('english'))
 from nltk.corpus import sentiwordnet as swn
 from nltk.corpus import wordnet as wn
 
-nltk.download('wordnet')
-nltk.download('sentiwordnet')
+
 from skdim.id import MLE
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -47,8 +44,8 @@ class BARTScorer:
         # Set up model
         self.device = device
         self.max_length = max_length
-        self.tokenizer = BartTokenizer.from_pretrained(checkpoint)
-        self.model = BartForConditionalGeneration.from_pretrained(checkpoint)
+        self.tokenizer = BartTokenizer.from_pretrained(checkpoint, local_files_only=True)
+        self.model = BartForConditionalGeneration.from_pretrained(checkpoint, local_files_only=True)
         self.model.eval()
         self.model.to(device)
 
@@ -299,11 +296,11 @@ def get_features(df, tokenizer, model):
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 MLE_solver = MLE()
-tokenizer_path = model_path = "roberta-base"
-tokenizer_rob = RobertaTokenizer.from_pretrained(tokenizer_path)
-model_rob = RobertaModel.from_pretrained(model_path)
+tokenizer_path = model_path = "./roberta-base"
+tokenizer_rob = RobertaTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
+model_rob = RobertaModel.from_pretrained(model_path, local_files_only=True)
 model_rob.to(device)
-bart_scorer = BARTScorer(device=device, checkpoint='facebook/bart-base')
+bart_scorer = BARTScorer(device=device, checkpoint='./bart-base')
 
 
 def get_x_features(df, tokenizer, model):

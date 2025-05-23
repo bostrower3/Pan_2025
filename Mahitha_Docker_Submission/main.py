@@ -8,10 +8,10 @@ import json
 import os
 import sys
 def load_tokenizer():
-    return AutoTokenizer.from_pretrained("gpt2")
+    return AutoTokenizer.from_pretrained("./gpt2",local_files_only = True)
 
 def load_model():
-    model = AutoModelForCausalLM.from_pretrained("gpt2")
+    model = AutoModelForCausalLM.from_pretrained("./gpt2",local_files_only = True)
     return model
 
 
@@ -33,8 +33,8 @@ def main(output_folder,input_file):
     tokenizer = load_tokenizer()
     model_xgb = load_xgboost_model()
     os.makedirs(output_folder, exist_ok=True)
-    output_file = os.path.join(output_folder,"output.jsonl")
-    output_data = []
+    output_file = os.path.join(output_folder,"predictions.jsonl")
+    
 
     with open(input_file, 'r') as fin, open(output_file, 'w') as json_file:
         for line in fin:
