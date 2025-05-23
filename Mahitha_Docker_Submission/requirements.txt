@@ -1,0 +1,12 @@
+matplotlib
+nltk
+numpy
+pandas
+scikit_dimension
+scikit_learn
+spacy
+torch
+tqdm
+transformers
+xgboost
+
