@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+xgboost
+transformers
+torch
+tqdm
+nltk
+textstat==0.7.5
+sentencepiece
+huggingface_hub
