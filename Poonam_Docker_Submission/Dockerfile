@@ -9,21 +9,17 @@ RUN apt-get update && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     pip3 install -r requirements.txt --no-cache --break-system-packages
 
-
+RUN python3 -c 'import nltk; nltk.download("punkt"); nltk.download("punkt_tab");'
 
 # Environment variables for offline mode
 ENV HF_HUB_OFFLINE=1
 ENV TRANSFORMERS_OFFLINE=1
-ENV NLTK_DATA=/app/nltk_data
 
 # Copy all necessary files and folders
-COPY main.py .
 COPY xgb_model.pkl .
 COPY rf_model.pkl .
 COPY tfidf_vectorizer.pkl .
-COPY gpt2 ./gpt2
-COPY bert-base-uncased ./bert-base-uncased
-COPY nltk_data ./nltk_data
+COPY main.py .
 
 # Run the main script
 CMD ["python", "main.py"]

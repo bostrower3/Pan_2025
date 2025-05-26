@@ -17,14 +17,12 @@ from nltk.tokenize import word_tokenize
 import pickle
 import os
 
-os.environ['NLTK_DATA'] = './nltk_data'
-
 # ==========================
 # Configuration
 # ==========================
-OBSERVER_MODEL_HUB_ID = "./gpt2"
-PERFORMER_MODEL_HUB_ID = "./gpt2"
-BERT_MODEL_HUB_ID = './bert-base-uncased' # BERT will also be loaded from Hub
+OBSERVER_MODEL_HUB_ID = "gpt2"
+PERFORMER_MODEL_HUB_ID = "gpt2"
+BERT_MODEL_HUB_ID = 'bert-base-uncased' # BERT will also be loaded from Hub
 
 # Paths to LOCALLY SAVED models (XGB, RF, TFIDF). BERT paths removed.
 SAVED_XGB_MODEL_PATH = "./xgb_model.pkl"
@@ -92,8 +90,8 @@ def calculate_perplexity_ratio(observer_model, performer_model, tokenizer, text,
 class BERTEmbedderInfer: # MODIFIED: Now loads from Hugging Face Hub
     def __init__(self, model_hub_id, device=None): # Takes Hub ID
         print(f"Loading BERT tokenizer and model ({model_hub_id}) from Hugging Face Hub...")
-        self.tokenizer = BertTokenizer.from_pretrained("./bert-base-uncased", local_files_only=True)
-        self.model = BertModel.from_pretrained("./bert-base-uncased", local_files_only=True)
+        self.tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", local_files_only=True)
+        self.model = BertModel.from_pretrained("bert-base-uncased", local_files_only=True)
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(self.device); self.model.eval()
         print("BERT embedder initialized from Hub.")
@@ -137,8 +135,8 @@ class Predictor:
             raise FileNotFoundError("Essential model components (XGB, RF, TFIDF) missing.")
 
         print(f"Loading Observer GPT-2 ({OBSERVER_MODEL_HUB_ID}) from Hugging Face Hub...")
-        self.observer_tokenizer = AutoTokenizer.from_pretrained("./gpt2", local_files_only=True)
-        self.observer_model = AutoModelForCausalLM.from_pretrained("./gpt2", local_files_only=True)
+        self.observer_tokenizer = AutoTokenizer.from_pretrained("gpt2", local_files_only=True)
+        self.observer_model = AutoModelForCausalLM.from_pretrained("gpt2", local_files_only=True)
         self.observer_model.to(self.device); self.observer_model.eval()
         if self.observer_tokenizer.pad_token_id is None:
             self.observer_tokenizer.pad_token_id = self.observer_tokenizer.eos_token_id
