@@ -9,3 +9,4 @@ nltk
 textstat==0.7.5
 sentencepiece
 huggingface_hub
+protobuf

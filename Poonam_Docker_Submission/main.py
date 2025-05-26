@@ -17,7 +17,7 @@ from nltk.tokenize import word_tokenize
 import pickle
 import os
 
-
+os.environ['NLTK_DATA'] = './nltk_data'
 
 # ==========================
 # Configuration
@@ -217,13 +217,13 @@ def run_predictions(args):
         print(f"Error reading input file {args.input_file}: {e}")
         return
 
-    output_file_path = os.path.join(args.output_dir, "predictions.jsonl")
-    if not os.path.exists(args.output_dir):
+    output_file_path = os.path.join(args.output_file, "predictions.jsonl")
+    if not os.path.exists(args.output_file):
         try:
-            os.makedirs(args.output_dir)
-            print(f"Created output directory: {args.output_dir}")
+            os.makedirs(args.output_file)
+            print(f"Created output directory: {args.output_file}")
         except OSError as e:
-            print(f"Error creating output directory {args.output_dir}: {e}")
+            print(f"Error creating output directory {args.output_file}: {e}")
             return
     
 
@@ -240,7 +240,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Predict human vs AI text (GPT-2 & BERT from Hub, others local).")
     parser.add_argument("--input_file", type=str, required=True, 
                         help="Path to the input JSONL file.")
-    parser.add_argument("--output_dir", type=str, required = True, 
+    parser.add_argument("--output_file", type=str, required = True, 
                         help="Path to the output JSONL file.")
     
     args = parser.parse_args()
