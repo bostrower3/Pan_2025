@@ -17,20 +17,19 @@ from nltk.tokenize import word_tokenize
 import pickle
 import os
 
-nltk.download('punkt', quiet=True)
-nltk.download('punkt_tab')
+
 
 # ==========================
 # Configuration
 # ==========================
-OBSERVER_MODEL_HUB_ID = "gpt2"
-PERFORMER_MODEL_HUB_ID = "gpt2"
-BERT_MODEL_HUB_ID = 'bert-base-uncased' # BERT will also be loaded from Hub
+OBSERVER_MODEL_HUB_ID = "./gpt2"
+PERFORMER_MODEL_HUB_ID = "./gpt2"
+BERT_MODEL_HUB_ID = './bert-base-uncased' # BERT will also be loaded from Hub
 
 # Paths to LOCALLY SAVED models (XGB, RF, TFIDF). BERT paths removed.
-SAVED_XGB_MODEL_PATH = "xgb_model.pkl"
-SAVED_RF_MODEL_PATH = "rf_model.pkl"
-SAVED_TFIDF_VECTORIZER_PATH = "tfidf_vectorizer.pkl"
+SAVED_XGB_MODEL_PATH = "./xgb_model.pkl"
+SAVED_RF_MODEL_PATH = "./rf_model.pkl"
+SAVED_TFIDF_VECTORIZER_PATH = "./tfidf_vectorizer.pkl"
 
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -93,8 +92,8 @@ def calculate_perplexity_ratio(observer_model, performer_model, tokenizer, text,
 class BERTEmbedderInfer: # MODIFIED: Now loads from Hugging Face Hub
     def __init__(self, model_hub_id, device=None): # Takes Hub ID
         print(f"Loading BERT tokenizer and model ({model_hub_id}) from Hugging Face Hub...")
-        self.tokenizer = BertTokenizer.from_pretrained(model_hub_id)
-        self.model = BertModel.from_pretrained(model_hub_id)
+        self.tokenizer = BertTokenizer.from_pretrained("./bert-base-uncased", local_files_only=True)
+        self.model = BertModel.from_pretrained("./bert-base-uncased", local_files_only=True)
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(self.device); self.model.eval()
         print("BERT embedder initialized from Hub.")
@@ -138,8 +137,8 @@ class Predictor:
             raise FileNotFoundError("Essential model components (XGB, RF, TFIDF) missing.")
 
         print(f"Loading Observer GPT-2 ({OBSERVER_MODEL_HUB_ID}) from Hugging Face Hub...")
-        self.observer_tokenizer = AutoTokenizer.from_pretrained(OBSERVER_MODEL_HUB_ID)
-        self.observer_model = AutoModelForCausalLM.from_pretrained(OBSERVER_MODEL_HUB_ID)
+        self.observer_tokenizer = AutoTokenizer.from_pretrained("./gpt2", local_files_only=True)
+        self.observer_model = AutoModelForCausalLM.from_pretrained("./gpt2", local_files_only=True)
         self.observer_model.to(self.device); self.observer_model.eval()
         if self.observer_tokenizer.pad_token_id is None:
             self.observer_tokenizer.pad_token_id = self.observer_tokenizer.eos_token_id
@@ -151,8 +150,8 @@ class Predictor:
             print("Performer GPT-2 is same as observer (loaded from Hub).")
         else:
             print(f"Loading Performer GPT-2 ({PERFORMER_MODEL_HUB_ID}) from Hugging Face Hub...")
-            self.performer_tokenizer = AutoTokenizer.from_pretrained(PERFORMER_MODEL_HUB_ID)
-            self.performer_model = AutoModelForCausalLM.from_pretrained(PERFORMER_MODEL_HUB_ID)
+            self.performer_tokenizer = AutoTokenizer.from_pretrained(PERFORMER_MODEL_HUB_ID,local_files_only = True)
+            self.performer_model = AutoModelForCausalLM.from_pretrained(PERFORMER_MODEL_HUB_ID,local_files_only = True)
             self.performer_model.to(self.device); self.performer_model.eval()
             if self.performer_tokenizer.pad_token_id is None:
                 self.performer_tokenizer.pad_token_id = self.performer_tokenizer.eos_token_id
@@ -218,17 +217,19 @@ def run_predictions(args):
         print(f"Error reading input file {args.input_file}: {e}")
         return
 
-    output_dir = os.path.dirname(args.output_file)
-    if output_dir and not os.path.exists(output_dir):
+    output_file_path = os.path.join(args.output_dir, "predictions.jsonl")
+    if not os.path.exists(args.output_dir):
         try:
-            os.makedirs(output_dir)
-            print(f"Created output directory: {output_dir}")
+            os.makedirs(args.output_dir)
+            print(f"Created output directory: {args.output_dir}")
         except OSError as e:
-            print(f"Error creating output directory {output_dir}: {e}")
+            print(f"Error creating output directory {args.output_dir}: {e}")
+            return
+    
 
     print(f"Writing predictions to: {args.output_file}")
     try:
-        with open(args.output_file, 'w') as fout:
+        with open(output_file_path, 'w') as fout:
             for pred_entry in predictions_for_output:
                 fout.write(json.dumps(pred_entry) + "\n")
         print(f"Predictions written successfully.")
@@ -239,7 +240,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Predict human vs AI text (GPT-2 & BERT from Hub, others local).")
     parser.add_argument("--input_file", type=str, required=True, 
                         help="Path to the input JSONL file.")
-    parser.add_argument("--output_file", type=str, default="output.jsonl", 
+    parser.add_argument("--output_dir", type=str, required = True, 
                         help="Path to the output JSONL file.")
     
     args = parser.parse_args()
